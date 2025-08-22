@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MEO事業 カスタマージャーニーマップ</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #ffffff;
+            color: #333;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            padding: 40px 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            margin-bottom: 30px;
+            border-radius: 10px;
+        }
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            color: white;
+        }
+        .header p {
+            font-size: 1.2em;
+            color: rgba(255,255,255,0.9);
+        }
+        
+        /* タブスタイル */
+        .persona-tabs {
+            display: flex;
+            border-bottom: 3px solid #667eea;
+            margin-bottom: 30px;
+            background: #f8f9fa;
+            border-radius: 10px 10px 0 0;
+            overflow: hidden;
+        }
+        .tab-button {
+            flex: 1;
+            padding: 15px 20px;
+            background: #f8f9fa;
+            border: none;
+            border-right: 1px solid #ddd;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s ease;
+        }
+        .tab-button:last-child {
+            border-right: none;
+        }
+        .tab-button.active {
+            background: #667eea;
+            color: #fff;
+        }
+        .tab-button:hover:not(.active) {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+        
+        /* タブコンテンツ */
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* ペルソナセクション */
+        .persona-section {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .persona-title {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            padding: 15px 25px;
+            margin: -25px -25px 20px -25px;
+            font-size: 1.3em;
+            font-weight: bold;
+            border-radius: 8px 8px 0 0;
+        }
+        .persona-content {
+            background: #fff;
+            padding: 20px;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            line-height: 1.8;
+        }
+        
+        /* ジャーニーテーブル */
+        .journey-table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 2px solid #667eea;
+            background: #fff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .category-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            font-weight: bold;
+            font-size: 1.1em;
+            width: 120px;
+            text-align: center;
+            vertical-align: middle;
+            padding: 20px 10px;
+            border-right: 1px solid #fff;
+        }
+        .phase-header {
+            background: linear-gradient(135deg, #4fc3f7 0%, #29b6f6 100%);
+            color: #fff;
+            text-align: center;
+            padding: 15px 10px;
+            font-weight: bold;
+            border: 1px solid #fff;
+            position: relative;
+        }
+        .phase-header:nth-child(2) { background: linear-gradient(135deg, #81c784 0%, #66bb6a 100%); }
+        .phase-header:nth-child(3) { background: linear-gradient(135deg, #ffb74d 0%, #ffa726 100%); }
+        .phase-header:nth-child(4) { background: linear-gradient(135deg, #f06292 0%, #ec407a 100%); }
+        .phase-header:nth-child(5) { background: linear-gradient(135deg, #ba68c8 0%, #ab47bc 100%); }
+        .phase-header:nth-child(6) { background: linear-gradient(135deg, #ff8a65 0%, #ff7043 100%); }
+        .phase-header:nth-child(7) { background: linear-gradient(135deg, #90a4ae 0%, #78909c 100%); }
+        
+        .phase-number {
+            display: block;
+            font-size: 0.9em;
+            color: rgba(255,255,255,0.9);
+            margin-bottom: 5px;
+            font-weight: normal;
+        }
+        .journey-cell {
+            padding: 15px;
+            border: 1px solid #e9ecef;
+            vertical-align: top;
+            line-height: 1.6;
+            background: #fff;
+            transition: background-color 0.2s ease;
+        }
+        .journey-cell:hover {
+            background: #f0f8ff;
+        }
+        
+        /* フェーズ別の行の色分け */
+        .journey-table tbody tr:nth-child(1) .journey-cell:nth-child(2) { border-left: 4px solid #4fc3f7; }
+        .journey-table tbody tr:nth-child(1) .journey-cell:nth-child(3) { border-left: 4px solid #81c784; }
+        .journey-table tbody tr:nth-child(1) .journey-cell:nth-child(4) { border-left: 4px solid #ffb74d; }
+        .journey-table tbody tr:nth-child(1) .journey-cell:nth-child(5) { border-left: 4px solid #f06292; }
+        .journey-table tbody tr:nth-child(1) .journey-cell:nth-child(6) { border-left: 4px solid #ba68c8; }
+        .journey-table tbody tr:nth-child(1) .journey-cell:nth-child(7) { border-left: 4px solid #ff8a65; }
+        
+        .journey-table tbody tr:nth-child(2) .journey-cell:nth-child(2) { border-left: 4px solid #4fc3f7; }
+        .journey-table tbody tr:nth-child(2) .journey-cell:nth-child(3) { border-left: 4px solid #81c784; }
+        .journey-table tbody tr:nth-child(2) .journey-cell:nth-child(4) { border-left: 4px solid #ffb74d; }
+        .journey-table tbody tr:nth-child(2) .journey-cell:nth-child(5) { border-left: 4px solid #f06292; }
+        .journey-table tbody tr:nth-child(2) .journey-cell:nth-child(6) { border-left: 4px solid #ba68c8; }
+        .journey-table tbody tr:nth-child(2) .journey-cell:nth-child(7) { border-left: 4px solid #ff8a65; }
+        
+        .journey-table tbody tr:nth-child(3) .journey-cell:nth-child(2) { border-left: 4px solid #4fc3f7; }
+        .journey-table tbody tr:nth-child(3) .journey-cell:nth-child(3) { border-left: 4px solid #81c784; }
+        .journey-table tbody tr:nth-child(3) .journey-cell:nth-child(4) { border-left: 4px solid #ffb74d; }
+        .journey-table tbody tr:nth-child(3) .journey-cell:nth-child(5) { border-left: 4px solid #f06292; }
+        .journey-table tbody tr:nth-child(3) .journey-cell:nth-child(6) { border-left: 4px solid #ba68c8; }
+        .journey-table tbody tr:nth-child(3) .journey-cell:nth-child(7) { border-left: 4px solid #ff8a65; }
+        
+        .journey-table tbody tr:nth-child(4) .journey-cell:nth-child(2) { border-left: 4px solid #4fc3f7; }
+        .journey-table tbody tr:nth-child(4) .journey-cell:nth-child(3) { border-left: 4px solid #81c784; }
+        .journey-table tbody tr:nth-child(4) .journey-cell:nth-child(4) { border-left: 4px solid #ffb74d; }
+        .journey-table tbody tr:nth-child(4) .journey-cell:nth-child(5) { border-left: 4px solid #f06292; }
+        .journey-table tbody tr:nth-child(4) .journey-cell:nth-child(6) { border-left: 4px solid #ba68c8; }
+        .journey-table tbody tr:nth-child(4) .journey-cell:nth-child(7) { border-left: 4px solid #ff8a65; }
+        
+        .journey-table tbody tr:nth-child(5) .journey-cell:nth-child(2) { border-left: 4px solid #4fc3f7; }
+        .journey-table tbody tr:nth-child(5) .journey-cell:nth-child(3) { border-left: 4px solid #81c784; }
+        .journey-table tbody tr:nth-child(5) .journey-cell:nth-child(4) { border-left: 4px solid #ffb74d; }
+        .journey-table tbody tr:nth-child(5) .journey-cell:nth-child(5) { border-left: 4px solid #f06292; }
+        .journey-table tbody tr:nth-child(5) .journey-cell:nth-child(6) { border-left: 4px solid #ba68c8; }
+        .journey-table tbody tr:nth-child(5) .journey-cell:nth-child(7) { border-left: 4px solid #ff8a65; }
+        
+        /* アイコンスタイル */
+        .touchpoint-list {
+            list-style: none;
+            padding: 0;
+        }
+        .touchpoint-list li {
+            padding: 5px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .touchpoint-list li:last-child {
+            border-bottom: none;
+        }
+        .touchpoint-list li::before {
+            content: "▪";
+            color: #000;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+        
+        /* 感情インジケーター */
+        .emotion {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 15px;
+            font-size: 0.85em;
+            font-weight: bold;
+            margin-left: 10px;
+            color: white;
+        }
+        .emotion:nth-of-type(1) { background: #e57373; } /* 焦り・不安 */
+        .emotion:nth-of-type(2) { background: #81c784; } /* 興味・期待 */
+        .emotion:nth-of-type(3) { background: #ffb74d; } /* 慎重・迷い */
+        .emotion:nth-of-type(4) { background: #f06292; } /* 決断・希望 */
+        .emotion:nth-of-type(5) { background: #ba68c8; } /* 安心・満足 */
+        .emotion:nth-of-type(6) { background: #90a4ae; } /* 信頼・忠誠 */
+        
+        /* ハイライト */
+        .highlight {
+            background: linear-gradient(120deg, #fff3e0 0%, #ffe0b2 100%);
+            padding: 2px 6px;
+            border-radius: 4px;
+            border-left: 3px solid #ff9800;
+            font-weight: bold;
+            color: #e65100;
+        }
+        
+        /* インサイトセクション */
+        .insights-section {
+            margin-top: 40px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .insights-title {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            padding: 15px 25px;
+            margin: -25px -25px 20px -25px;
+            font-size: 1.3em;
+            font-weight: bold;
+            border-radius: 8px 8px 0 0;
+        }
+        .insights-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            background: #fff;
+            padding: 20px;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+        }
+        .insights-grid h4 {
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            color: #667eea;
+        }
+        .insights-grid ul {
+            list-style: none;
+        }
+        .insights-grid li {
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background-color 0.2s ease;
+        }
+        .insights-grid li:hover {
+            background: #f8f9fa;
+            padding-left: 10px;
+        }
+        .insights-grid li::before {
+            content: "→";
+            font-weight: bold;
+            margin-right: 8px;
+            color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>MEO事業 カスタマージャーニーマップ</h1>
+            <p>顧客の行動・思考・感情・タッチポイントを可視化</p>
+        </div>
+        
+        <!-- ペルソナタブ -->
+        <div class="persona-tabs">
+            <button class="tab-button active" onclick="showPersona('persona1')">ペルソナ1: 飲食店オーナー</button>
+            <button class="tab-button" onclick="showPersona('persona2')">ペルソナ2: 美容クリニック経営者</button>
+            <button class="tab-button" onclick="showPersona('persona3')">ペルソナ3: 複数店舗チェーン担当者</button>
+        </div>
+
+        <!-- ペルソナ1: 飲食店オーナー -->
+        <div id="persona1" class="tab-content active">
+            <div class="persona-section">
+                <div class="persona-title">ペルソナ1: 個人経営飲食店オーナー</div>
+                <div class="persona-content">
+                    <strong>田中 一郎（居酒屋「たなか」オーナー）</strong><br>
+                    年齢：48歳 / 性別：男性 / 家族：妻・息子1人 / 事業：個人経営居酒屋（開業15年）/ 所在：東京都世田谷区<br>
+                    課題：食べログ・ぐるなびの効果低下、コロナ後の売上回復が進まない、デジタル集客の知識不足<br>
+                    特徴：アナログ志向だが危機感から新しい手法を模索、予算月3-5万円、即効性を期待
+                </div>
+            </div>
+
+            <table class="journey-table">
+                <thead>
+                    <tr>
+                        <th class="category-header">項目</th>
+                        <th class="phase-header"><span class="phase-number">Phase 1</span>認知・課題発見</th>
+                        <th class="phase-header"><span class="phase-number">Phase 2</span>興味関心・情報収集</th>
+                        <th class="phase-header"><span class="phase-number">Phase 3</span>比較検討・業者選定</th>
+                        <th class="phase-header"><span class="phase-number">Phase 4</span>購入・契約決定</th>
+                        <th class="phase-header"><span class="phase-number">Phase 5</span>利用・運用開始</th>
+                        <th class="phase-header"><span class="phase-number">Phase 6</span>継続・拡張</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="category-header">行動</td>
+                        <td class="journey-cell">
+                            ・食べログの効果が感じられない<br>
+                            ・近隣店舗の集客状況を観察<br>
+                            ・「居酒屋 集客」でGoogle検索
+                        </td>
+                        <td class="journey-cell">
+                            ・「MEO対策とは」で検索<br>
+                            ・MEO業者のサイト閲覧<br>
+                            ・無料ウェビナーに参加
+                        </td>
+                        <td class="journey-cell">
+                            ・3社から相見積取得<br>
+                            ・知人の飲食店オーナーに相談<br>
+                            ・提案内容と価格を比較
+                        </td>
+                        <td class="journey-cell">
+                            ・最も信頼できそうな1社に決定<br>
+                            ・契約条件を確認<br>
+                            ・初回打ち合わせの実施
+                        </td>
+                        <td class="journey-cell">
+                            ・GBP情報の整備に協力<br>
+                            ・月次レポートの確認<br>
+                            ・効果について質問・相談
+                        </td>
+                        <td class="journey-cell">
+                            ・契約継続を決定<br>
+                            ・追加サービスを検討<br>
+                            ・同業者への紹介を実施
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="category-header">思考</td>
+                        <td class="journey-cell">
+                            このままでは店が危ない。<span class="highlight">新しい集客方法</span>を見つけなければ
+                            <span class="emotion">焦り・不安</span>
+                        </td>
+                        <td class="journey-cell">
+                            MEOという方法があるんだな。Googleマップから来客があるなら試したい
+                            <span class="emotion">興味・期待</span>
+                        </td>
+                        <td class="journey-cell">
+                            どの業者が<span class="highlight">一番効果的</span>だろう？失敗は許されない
+                            <span class="emotion">慎重・迷い</span>
+                        </td>
+                        <td class="journey-cell">
+                            この業者なら<span class="highlight">信頼して任せられる</span>かもしれない
+                            <span class="emotion">決断・希望</span>
+                        </td>
+                        <td class="journey-cell">
+                            思ったより<span class="highlight">効果が早く</span>出てきた。続ける価値がある
+                            <span class="emotion">安心・満足</span>
+                        </td>
+                        <td class="journey-cell">
+                            この業者に任せて正解だった。<span class="highlight">長期的にお願い</span>したい
+                            <span class="emotion">信頼・忠誠</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="category-header">タッチポイント</td>
+                        <td class="journey-cell">
+                            <ul class="touchpoint-list">
+                                <li>Google検索</li>
+                                <li>同業者との会話</li>
+                                <li>食べログ管理画面</li>
+                            </ul>
+                        </td>
+                        <td class="journey-cell">
+                            <ul class="touchpoint-list">
+                                <li>MEO業者サイト</li>
+                                <li>無料ウェビナー</li>
+                                <li>資料ダウンロード</li>
+                            </ul>
+                        </td>
+                        <td class="journey-cell">
+                            <ul class="touchpoint-list">
+                                <li>電話・メール相談</li>
+                                <li>対面商談</li>
+                                <li>提案書・見積書</li>
+                            </ul>
+                        </td>
+                        <td class="journey-cell">
+                            <ul class="touchpoint-list">
+                                <li>最終商談</li>
+                                <li>契約書</li>
+                                <li>初回ミーティング</li>
+                            </ul>
+                        </td>
+                        <td class="journey-cell">
+                            <ul class="touchpoint-list">
+                                <li>管理画面</li>
+                                <li>月次レポート</li>
+                                <li>担当者との定期連絡</li>
+                            </ul>
+                        </td>
+                        <td class="journey-cell">
+                            <ul class="touchpoint-list">
+                                <li>契約更新手続き</li>
+                                <li>継続サポート</li>
+                                <li>新サービス案内</li>
+                            </ul>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="category-header">課題・ニーズ</td>
+                        <td class="journey-cell">
+                            ・<span class="highlight">集客方法がわからない</span><br>
+                            ・従来手法の効果低下<br>
+                            ・デジタル知識不足
+                        </td>
+                        <td class="journey-cell">
+                            ・MEOの<span class="highlight">基礎知識</span><br>
+                            ・飲食店の成功事例<br>
+                            ・費用対効果の目安
+                        </td>
+                        <td class="journey-cell">
+                            ・<span class="highlight">信頼できる業者</span><br>
+                            ・適正価格の確認<br>
+                            ・実績・事例の提示
+                        </td>
+                        <td class="journey-cell">
+                            ・<span class="highlight">契約条件の調整</span><br>
+                            ・効果保証の有無<br>
+                            ・サポート体制確認
+                        </td>
+                        <td class="journey-cell">
+                            ・<span class="highlight">効果の可視化</span><br>
+                            ・改善提案<br>
+                            ・運用負担軽減
+                        </td>
+                        <td class="journey-cell">
+                            ・<span class="highlight">継続的成果向上</span><br>
+                            ・新サービス情報<br>
+                            ・長期関係構築
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- ペルソナ2: 美容クリニック経営者 -->
+        <div id="persona2" class="tab-content">
+            <div class="persona-section">
+                <div class="persona-title">ペルソナ2: 美容クリニック経営者</div>
+                <div class="persona-content">
+                    <strong>山田 優子（美容皮膚科「山田ゆうこクリニック」院長）</strong><br>
+                    年齢：42歳 / 性別：女性 / 家族：夫・娘2人 / 事業：美容皮膚科クリニック（開業8年）/ 所在：東京都渋谷区<br>
+                    課題：競合クリニック増加、集客単価の高騰、ホットペッパービューティーへの依存度が高い<br>
+                    特徴：デジタルマーケティングへの理解あり、予算月5-8万円、ROI重視、長期的視点
+                </div>
+            </div>
+
+            <table class="journey-table">
+                <thead>
+                    <tr>
+                        <th class="category-header">項目</th>
+                        <th class="phase-header"><span class="phase-number">Phase 1</span>認知・課題発見</th>
+                        <th class="phase-header"><span class="phase-number">Phase 2</span>興味関心・情報収集</th>
+                        <th class="phase-header"><span class="phase-number">Phase 3</span>比較検討・業者選定</th>
+                        <th class="phase-header"><span class="phase-number">Phase 4</span>購入・契約決定</th>
+                        <th class="phase-header"><span class="phase-number">Phase 5</span>利用・運用開始</th>
+                        <th class="phase-header"><span class="phase-number">Phase 6</span>継続・拡張</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="category-header">行動</td>
+                        <td class="journey-cell">
+                            ・ホットペッパーの費用対効果を分析<br>
+                            ・競合クリニックの集客手法を調査<br>
+                            ・「美容クリニック 集客」で検索
+                        </td>
+                        <td class="journey-cell">
+                            ・「MEO 美容クリニック」で検索<br>
+                            ・業界専門ウェビナーに参加<br>
+                            ・MEO対策の事例を研究
+                        </td>
+                        <td class="journey-cell">
+                            ・5社の詳細提案を比較<br>
+                            ・同業のクリニックに事例確認<br>
+                            ・ROI試算を詳細検討
+                        </td>
+                        <td class="journey-cell">
+                            ・最もROIの高い業者を選定<br>
+                            ・詳細な契約条件を交渉<br>
+                            ・効果測定方法を確認
+                        </td>
+                        <td class="journey-cell">
+                            ・クリニック情報の最適化<br>
+                            ・症例写真の提供<br>
+                            ・効果測定データの分析
+                        </td>
+                        <td class="journey-cell">
+                            ・効果を実感し契約継続<br>
+                            ・他の集客チャネルも相談<br>
+                            ・分院展開時の対策検討
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="category-header">思考</td>
+                        <td class="journey-cell">
+                            ホットペッパーだけでは<span class="highlight">リスクが高い</span>。他の集客手法も必要
+                            <span class="emotion">危機感・検討</span>
+                        </td>
+                        <td class="journey-cell">
+                            MEOなら<span class="highlight">自社資産として蓄積</span>できそう。詳しく調べてみよう
+                            <span class="emotion">関心・分析</span>
+                        </td>
+                        <td class="journey-cell">
+                            <span class="highlight">データに基づいた提案</span>をしてくれる業者がいい
+                            <span class="emotion">比較・分析</span>
+                        </td>
+                        <td class="journey-cell">
+                            この業者なら<span class="highlight">医療業界の特性</span>を理解してくれそう
+                            <span class="emotion">確信・決定</span>
+                        </td>
+                        <td class="journey-cell">
+                            <span class="highlight">想定以上の効果</span>が出ている。投資して正解だった
+                            <span class="emotion">満足・評価</span>
+                        </td>
+                        <td class="journey-cell">
+                            長期的なパートナーとして<span class="highlight">事業成長を支援</span>してもらいたい
+                            <span class="emotion">信頼・期待</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="category-header">タッチポイント</td>
+                        <td class="journey-cell">
+                            <ul class="touchpoint-list">
+                                <li>業界メディア</li>
+                                <li>競合分析ツール</li>
+                                <li>マーケティングセミナー</li>
+                            </ul>
+                        </td>
+                        <td class="journey-cell">
+                            <ul class="touchpoint-list">
+                                <li>専門ウェビナー</li>
+                                <li>業界特化記事</li>
+                                <li>事例集ダウンロード</li>
+                            </ul>
+                        </td>
+                        <td class="journey-cell">
+                            <ul class="touchpoint-list">
+                                <li>詳細提案書</li>
+                                <li>ROI試算書</li>
+                                <li>リファレンス確認</li>
+                            </ul>
+                        </td>
+                        <td class="journey-cell">
+                            <ul class="touchpoint-list">
+                                <li>契約書詳細確認</li>
+                                <li>KPI設定ミーティング</li>
+                                <li>専任担当者紹介</li>
+                            </ul>
+                        </td>
+                        <td class="journey-cell">
+                            <ul class="touchpoint-list">
+                                <li>詳細分析レポート</li>
+                                <li>月次改善提案</li>
+                                <li>競合分析データ</li>
+                            </ul>
+                        </td>
+                        <td class="journey-cell">
+                            <ul class="touchpoint-list">
+                                <li>年間戦略会議</li>
+                                <li>新サービス提案</li>
+                                <li>拡張計画サポート</li>
+                            </ul>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="category-header">課題・ニーズ</td>
+                        <td class="journey-cell">
+                            ・<span class="highlight">集客の多様化</span><br>
+                            ・プラットフォーム依存脱却<br>
+                            ・競合差別化
+                        </td>
+                        <td class="journey-cell">
+                            ・医療業界の<span class="highlight">専門知識</span><br>
+                            ・詳細なROI試算<br>
+                            ・競合分析データ
+                        </td>
+                        <td class="journey-cell">
+                            ・<span class="highlight">データドリブン</span>な提案<br>
+                            ・医療広告ガイドライン対応<br>
+                            ・実績の定量的証明
+                        </td>
+                        <td class="journey-cell">
+                            ・<span class="highlight">詳細なKPI設定</span><br>
+                            ・効果測定体制<br>
+                            ・専門性の高いサポート
+                        </td>
+                        <td class="journey-cell">
+                            ・<span class="highlight">詳細な効果分析</span><br>
+                            ・継続的な改善提案<br>
+                            ・競合対策
+                        </td>
+                        <td class="journey-cell">
+                            ・<span class="highlight">戦略的パートナーシップ</span><br>
+                            ・事業拡張サポート<br>
+                            ・新技術の活用提案
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- ペルソナ3: 複数店舗チェーン担当者 -->
+        <div id="persona3" class="tab-content">
+            <div class="persona-section">
+                <div class="persona-title">ペルソナ3: 複数店舗チェーン担当者</div>
+                <div class="persona-content">
+                    <strong>鈴木 一郎（株式会社ABC マーケティング部長）</strong><br>
+                    年齢：39歳 / 性別：男性 / 家族：妻・息子1人 / 事業：冠婚葬祭業（直営35店舗）/ 所在：福井県・岐阜県<br>
+                    課題：店舗数が多く管理が大変、地域ごとの最適化が必要、統一した施策展開の難しさ<br>
+                    特徴：企業のマーケ担当、承認プロセスが複雑、予算規模大きい（月20-50万円）、効率性重視
+                </div>
+            </div>
+
+            <table class="journey-table">
+                <thead>
+                    <tr>
+                        <th class="category-header">項目</th>
+                        <th class="phase-header"><span class="phase-number">Phase 1</span>認知・課題発見</th>
+                        <th class="phase-header"><span class="phase-number">Phase 2</span>興味関心・情報収集</th>
+                        <th class="phase-header"><span class="phase-number">Phase 3</span>比較検討・業者選定</th>
+                        <th class="phase-header"><span class="phase-number">Phase 4</span>購入・契約決定</th>
+                        <th class="phase-header"><span class="phase-number">Phase 5</span>利用・運用開始</th>
+                        <th class="phase-header"><span class="phase-number">Phase 6</span>継続・拡張</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="category-header">行動</td>
+                        <td class="journey-cell">
+                            ・既存MEO業者の効果を分析<br>
+                            ・35店舗の一括管理方法を検討<br>
+                            ・「複数店舗 MEO」で情報収集
+                        </td>
+                        <td class="journey-cell">
+                            ・チェーン店向けサービスを調査<br>
+                            ・一括管理ツールの機能確認<br>
+                            ・他社事例の詳細分析
+                        </td>
+                        <td class="journey-cell">
+                            ・複数社からの詳細提案<br>
+                            ・管理効率性の比較<br>
+                            ・コストパフォーマンス分析
+                        </td>
+                        <td class="journey-cell">
+                            ・社内稟議書の作成<br>
+                            ・段階的導入プランの確認<br>
+                            ・契約条件の最終調整
+                        </td>
+                        <td class="journey-cell">
+                            ・全店舗情報の一括登録<br>
+                            ・管理画面での効果確認<br>
+                            ・各店舗への運用指導
+                        </td>
+                        <td class="journey-cell">
+                            ・効果の高い店舗の横展開<br>
+                            ・新規出店時の対策追加<br>
+                            ・他部門への紹介検討
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="category-header">思考</td>
+                        <td class="journey-cell">
+                            35店舗を<span class="highlight">効率的に管理</span>する方法が必要。現状では手が回らない
+                            <span class="emotion">課題認識・緊急性</span>
+                        </td>
+                        <td class="journey-cell">
+                            <span class="highlight">一括管理できるツール</span>があれば業務効率が大幅に改善できそう
+                            <span class="emotion">期待・検討</span>
+                        </td>
+                        <td class="journey-cell">
+                            <span class="highlight">コストパフォーマンス</span>と管理効率のバランスが重要
+                            <span class="emotion">慎重・比較</span>
+                        </td>
+                        <td class="journey-cell">
+                            この業者なら<span class="highlight">大規模運用のノウハウ</span>がありそう
+                            <span class="emotion">確信・決断</span>
+                        </td>
+                        <td class="journey-cell">
+                            <span class="highlight">管理が楽になった</span>し、効果も見えてきている
+                            <span class="emotion">満足・評価</span>
+                        </td>
+                        <td class="journey-cell">
+                            <span class="highlight">戦略的パートナー</span>として長期的に協力してもらいたい
+                            <span class="emotion">信頼・拡張意向</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="category-header">タッチポイント</td>
+                        <td class="journey-cell">
+                            <ul class="touchpoint-list">
+                                <li>業界専門メディア</li>
+                                <li>マーケティングカンファレンス</li>
+                                <li>既存業者からの情報</li>
+                            </ul>
+                        </td>
+                        <td class="journey-cell">
+                            <ul class="touchpoint-list">
+                                <li>チェーン店向けセミナー</li>
+                                <li>大規模事例の資料</li>
+                                <li>管理ツールデモ</li>
+                            </ul>
+                        </td>
+                        <td class="journey-cell">
+                            <ul class="touchpoint-list">
+                                <li>詳細提案プレゼン</li>
+                                <li>ROI詳細試算</li>
+                                <li>他社導入事例確認</li>
+                            </ul>
+                        </td>
+                        <td class="journey-cell">
+                            <ul class="touchpoint-list">
+                                <li>役員向けプレゼン</li>
+                                <li>契約書・SLA確認</li>
+                                <li>導入スケジュール策定</li>
+                            </ul>
+                        </td>
+                        <td class="journey-cell">
+                            <ul class="touchpoint-list">
+                                <li>一括管理ダッシュボード</li>
+                                <li>月次統合レポート</li>
+                                <li>定期戦略ミーティング</li>
+                            </ul>
+                        </td>
+                        <td class="journey-cell">
+                            <ul class="touchpoint-list">
+                                <li>年間戦略レビュー</li>
+                                <li>新サービス優先案内</li>
+                                <li>拡張計画コンサル</li>
+                            </ul>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="category-header">課題・ニーズ</td>
+                        <td class="journey-cell">
+                            ・<span class="highlight">大規模店舗の一括管理</span><br>
+                            ・業務効率化<br>
+                            ・統一品質の担保
+                        </td>
+                        <td class="journey-cell">
+                            ・<span class="highlight">スケーラブルな仕組み</span><br>
+                            ・管理工数削減<br>
+                            ・他社大規模事例
+                        </td>
+                        <td class="journey-cell">
+                            ・<span class="highlight">大規模運用実績</span><br>
+                            ・コストスケールメリット<br>
+                            ・管理体制の充実
+                        </td>
+                        <td class="journey-cell">
+                            ・<span class="highlight">段階的導入対応</span><br>
+                            ・SLA明確化<br>
+                            ・専任体制構築
+                        </td>
+                        <td class="journey-cell">
+                            ・<span class="highlight">統合的な効果分析</span><br>
+                            ・店舗間比較分析<br>
+                            ・改善施策の横展開
+                        </td>
+                        <td class="journey-cell">
+                            ・<span class="highlight">戦略的コンサルティング</span><br>
+                            ・新規出店サポート<br>
+                            ・他事業への展開支援
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- インサイト -->
+        <div class="insights-section">
+            <div class="insights-title">重要インサイト</div>
+            <div class="insights-grid">
+                <div>
+                    <h4>ペルソナ別重要ポイント</h4>
+                    <ul>
+                        <li><strong>飲食店オーナー：</strong>即効性と信頼関係重視</li>
+                        <li><strong>美容クリニック：</strong>ROIとデータ分析重視</li>
+                        <li><strong>チェーン担当者：</strong>効率性と拡張性重視</li>
+                        <li><strong>共通点：</strong>既存手法の限界を感じている</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4>フェーズ別対策優先度</h4>
+                    <ul>
+                        <li><strong>認知段階：</strong>ペルソナ別コンテンツ強化</li>
+                        <li><strong>興味段階：</strong>業種特化ウェビナー展開</li>
+                        <li><strong>検討段階：</strong>詳細提案と実績開示</li>
+                        <li><strong>決定段階：</strong>柔軟な契約条件と保証</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showPersona(personaId) {
+            // 全てのタブコンテンツを非表示
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(content => content.classList.remove('active'));
+            
+            // 全てのタブボタンを非アクティブ
+            const buttons = document.querySelectorAll('.tab-button');
+            buttons.forEach(button => button.classList.remove('active'));
+            
+            // 選択されたタブコンテンツを表示
+            document.getElementById(personaId).classList.add('active');
+            
+            // 選択されたタブボタンをアクティブ
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+</html>
